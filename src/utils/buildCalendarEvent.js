@@ -1,5 +1,6 @@
 import { COMPETITIONS } from "../config/competitions.js";
 import { SETTINGS } from "../config/settings.js";
+import { buildSummary } from "./buildSummary.js";
 
 export function buildCalendarEvent(match) {
 
@@ -30,8 +31,7 @@ ${match.intRound ?? "-"}
 
   return {
 
-    summary:
-`${competition.emoji} ${match.strHomeTeam} × ${match.strAwayTeam}`,
+    summary: buildSummary(match),
 
     description,
 

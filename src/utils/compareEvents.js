@@ -1,34 +1,33 @@
-export function compareEvents(googleEvent, calendarEvent) {
+export function compareEvents(currentEvent, desiredEvent) {
 
-  if (googleEvent.summary !== calendarEvent.summary) {
+  if (currentEvent.summary !== desiredEvent.summary) {
     return false;
   }
 
-  if (googleEvent.description !== calendarEvent.description) {
+  if (
+    (currentEvent.description ?? "").trim() !==
+    (desiredEvent.description ?? "").trim()
+  ) {
     return false;
   }
 
-  const googleStart = new Date(
-    googleEvent.start.dateTime
-  ).getTime();
+  const currentStart =
+    new Date(currentEvent.start.dateTime).getTime();
 
-  const desiredStart = new Date(
-    calendarEvent.start.dateTime
-  ).getTime();
+  const desiredStart =
+    new Date(desiredEvent.start.dateTime).getTime();
 
-  if (googleStart !== desiredStart) {
+  if (currentStart !== desiredStart) {
     return false;
   }
 
-  const googleEnd = new Date(
-    googleEvent.end.dateTime
-  ).getTime();
+  const currentEnd =
+    new Date(currentEvent.end.dateTime).getTime();
 
-  const desiredEnd = new Date(
-    calendarEvent.end.dateTime
-  ).getTime();
+  const desiredEnd =
+    new Date(desiredEvent.end.dateTime).getTime();
 
-  if (googleEnd !== desiredEnd) {
+  if (currentEnd !== desiredEnd) {
     return false;
   }
 

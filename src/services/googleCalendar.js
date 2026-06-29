@@ -15,7 +15,6 @@ const calendar = google.calendar({
 });
 
 export async function createMatchEvent(calendarId, match) {
-
   const event = buildCalendarEvent(match);
 
   await calendar.events.insert({
@@ -27,7 +26,6 @@ export async function createMatchEvent(calendarId, match) {
 }
 
 export async function updateMatchEvent(calendarId, eventId, match) {
-
   const event = buildCalendarEvent(match);
 
   await calendar.events.update({
@@ -41,14 +39,22 @@ export async function updateMatchEvent(calendarId, eventId, match) {
 
 export async function getCalendarEvents(calendarId) {
 
+  // Busca eventos dos últimos 120 dias
+  const timeMin = new Date();
+  timeMin.setDate(timeMin.getDate() - 120);
+
+  // Busca eventos até 365 dias no futuro
+  const timeMax = new Date();
+  timeMax.setDate(timeMax.getDate() + 365);
+
   const response = await calendar.events.list({
     calendarId,
-    timeMin: new Date().toISOString(),
+    timeMin: timeMin.toISOString(),
+    timeMax: timeMax.toISOString(),
     singleEvents: true,
     orderBy: "startTime",
-    maxResults: 100,
+    maxResults: 500,
   });
 
   return response.data.items ?? [];
-
 }

@@ -4,44 +4,41 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const api = axios.create({
-  baseURL: `https://www.thesportsdb.com/api/v1/json/${process.env.SPORTSDB_API_KEY}`,
+  baseURL: `https://www.thesportsdb.com/api/v1/json/${process.env.THESPORTSDB_API_KEY}`,
 });
 
-export async function searchTeam(teamName) {
-  try {
-
-    const response = await api.get("/searchteams.php", {
-      params: {
-        t: teamName,
-      },
-    });
-
-    return response.data.teams;
-
-  } catch (error) {
-
-    console.error(error.message);
-    return [];
-
-  }
+async function getNextEvents(teamId) {
+  const { data } = await api.get(`/eventsnext.php?id=${teamId}`);
+  return data.events ?? [];
 }
-export async function getNextEvents(teamId) {
 
-  try {
+async function getLastEvents(teamId) {
+  const { data } = await api.get(`/eventslast.php?id=${teamId}`);
+  return data.results ?? [];
+}
 
-    const response = await api.get("/eventsnext.php", {
-      params: {
-        id: teamId,
-      },
-    });
+export async function getFixtures(teamId) {
+  const [nextEvents, lastEvents] = await Promise.all([
+    getNextEvents(teamId),
+    getLastEvents(teamId),
+  ]);
 
-    return response.data.events ?? [];
+  const fixtures = [...lastEvents, ...nextEvents];
 
-  } catch (error) {
+  // Remove partidas duplicadas
+  const uniqueFixtures = [];
+  const ids = new Set();
 
-    console.error(error.message);
-    return [];
-
+  for (const match of fixtures) {
+    if (!ids.has(match.idEvent)) {
+      ids.add(match.idEvent);
+      uniqueFixtures.push(match);
+    }
   }
 
+  // ===== DEBUG TEMPORÁRIO =====
+  
+  // ============================
+
+  return uniqueFixtures;
 }
