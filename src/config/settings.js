@@ -1,0 +1,11 @@
+export const SETTINGS = {
+
+  TIMEZONE: "America/Sao_Paulo",
+
+  MATCH_DURATION_MINUTES: 120,
+
+  REMINDER_MINUTES: 60,
+
+  DEFAULT_COMPETITION_EMOJI: "⚽",
+
+};
