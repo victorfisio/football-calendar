@@ -1,0 +1,44 @@
+name: Football Calendar Sync
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "0 */6 * * *"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create credentials folder
+        run: mkdir -p credentials
+
+      - name: Create service account file
+        run: |
+          cat <<EOF > credentials/service-account.json
+          ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          EOF
+
+      - name: Create .env file
+        run: |
+          cat <<EOF > .env
+          SPORTSDB_API_KEY=${{ secrets.SPORTSDB_API_KEY }}
+          PALMEIRAS_CALENDAR_ID=${{ secrets.PALMEIRAS_CALENDAR_ID }}
+          ARSENAL_CALENDAR_ID=${{ secrets.ARSENAL_CALENDAR_ID }}
+          EOF
+
+      - name: Run synchronization
+        run: npm start
