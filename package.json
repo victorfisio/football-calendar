@@ -1,23 +1,41 @@
 {
   "name": "football-calendar",
   "version": "1.0.0",
-  "description": "Agenda automática dos jogos do Palmeiras e Arsenal",
+  "description": "Automatic synchronization of football matches to Google Calendar.",
   "main": "index.js",
+  "type": "module",
+
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "test": "echo \"No tests configured\""
   },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/victorfisio/football-calendar.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
+
+  "keywords": [
+    "google-calendar",
+    "football",
+    "soccer",
+    "palmeiras",
+    "arsenal",
+    "thesportsdb",
+    "calendar",
+    "automation"
+  ],
+
+  "author": "Victor Santos",
+
+  "license": "MIT",
+
   "bugs": {
     "url": "https://github.com/victorfisio/football-calendar/issues"
   },
+
   "homepage": "https://github.com/victorfisio/football-calendar#readme",
+
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",
     "axios": "^1.18.1",
