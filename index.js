@@ -22,7 +22,7 @@ async function main() {
         `❌ Erro ao sincronizar ${team.name}.`
       );
 
-      console.error(error.message);
+      console.error(error);;
 
       console.log("");
 

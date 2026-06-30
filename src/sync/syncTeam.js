@@ -1,33 +1,38 @@
 import { getFixtures } from "../services/sportsdb.js";
 import { getCalendarEvents } from "../services/googleCalendar.js";
+
 import { buildEventMap } from "../utils/eventMap.js";
+import { isLiveMatch } from "../utils/isLiveMatch.js";
+import { logger } from "../utils/logger.js";
+
 import { syncMatch } from "./syncMatch.js";
 import { removeDuplicates } from "../cleanup/removeDuplicates.js";
-import { isLiveMatch } from "../utils/isLiveMatch.js";
 
 export async function syncTeam(team) {
 
-  console.log("\n==============================");
-  console.log(`Sincronizando ${team.name}`);
-  console.log("==============================");
+  logger.title(`Sincronizando ${team.name}`);
 
-  // Busca partidas
   const matches = await getFixtures(team.id);
 
-  console.log(`Jogos encontrados: ${matches.length}`);
+  logger.info(`Jogos encontrados: ${matches.length}`);
 
-  // Verifica se existe jogo ao vivo
-  const liveMatches = matches.filter(isLiveMatch);
+  const liveMatches =
+    matches.filter(isLiveMatch);
 
   if (liveMatches.length > 0) {
 
     console.log("");
-    console.log("🔴 Jogos ao vivo:");
+
+    logger.warning("Jogos ao vivo:");
 
     for (const match of liveMatches) {
 
-      console.log(`${match.strEvent}`);
-      console.log(`Status: ${match.strStatus}`);
+      console.log(match.strEvent);
+
+      console.log(
+        `Status: ${match.strStatus}`
+      );
+
       console.log(
         `Placar: ${match.intHomeScore ?? 0}×${match.intAwayScore ?? 0}`
       );
@@ -38,46 +43,42 @@ export async function syncTeam(team) {
 
   }
 
-  // Nenhuma partida encontrada
   if (matches.length === 0) {
 
-    console.log("⚠ Nenhuma partida encontrada.\n");
+    logger.warning("Nenhuma partida encontrada.");
 
-    return false;
+    return;
 
   }
 
-  // Busca eventos existentes
   let calendarEvents =
     await getCalendarEvents(team.calendarId);
 
-  console.log(
+  logger.info(
     `Eventos no calendário: ${calendarEvents.length}`
   );
 
-  // Remove duplicatas
   await removeDuplicates(
     team.calendarId,
     calendarEvents
   );
 
-  // Recarrega eventos após limpeza
   calendarEvents =
     await getCalendarEvents(team.calendarId);
 
-  console.log(
+  logger.info(
     `Eventos após limpeza: ${calendarEvents.length}`
   );
 
-  // Indexa eventos
   const eventMap =
     buildEventMap(calendarEvents);
 
-  console.log(
-    `Eventos indexados: ${eventMap.size}\n`
+  logger.info(
+    `Eventos indexados: ${eventMap.size}`
   );
 
-  // Sincroniza partidas
+  console.log("");
+
   for (const match of matches) {
 
     await syncMatch(
@@ -88,11 +89,12 @@ export async function syncTeam(team) {
 
   }
 
-  console.log(
-    `\n✅ ${team.name} sincronizado.\n`
+  console.log("");
+
+  logger.success(
+    `${team.name} sincronizado.`
   );
 
-  // Retorna se existe jogo ao vivo
-  return liveMatches.length > 0;
+  console.log("");
 
 }

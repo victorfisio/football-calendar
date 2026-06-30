@@ -1,20 +1,16 @@
 name: Football Calendar Sync
 
 on:
-
   schedule:
     - cron: "*/5 * * * *"
 
   workflow_dispatch:
 
 jobs:
-
   sync:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -26,14 +22,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Create credentials file
+      - name: Create credentials
         run: |
           mkdir -p credentials
-          echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT }}' > credentials/service-account.json
+          echo '${{ secrets.GOOGLE_SERVICES_ACCOUNT }}' > credentials/service-account.json
 
       - name: Create .env
         run: |
-          echo "SPORTSDB_API_KEY=${{ secrets.SPORTSDB_API_KEY }}" >> .env
+          echo "THESPORTSDB_API_KEY=${{ secrets.THESPORTSDB_API_KEY }}" >> .env
           echo "PALMEIRAS_CALENDAR_ID=${{ secrets.PALMEIRAS_CALENDAR_ID }}" >> .env
           echo "ARSENAL_CALENDAR_ID=${{ secrets.ARSENAL_CALENDAR_ID }}" >> .env
 
