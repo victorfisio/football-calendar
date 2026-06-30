@@ -15,46 +15,95 @@ const calendar = google.calendar({
 });
 
 export async function createMatchEvent(calendarId, match) {
-  const event = buildCalendarEvent(match);
 
-  await calendar.events.insert({
-    calendarId,
-    requestBody: event,
-  });
+  try {
 
-  console.log(`✅ ${match.strEvent} criado.`);
+    await calendar.events.insert({
+      calendarId,
+      requestBody: buildCalendarEvent(match),
+    });
+
+    console.log(`✅ ${match.strEvent} criado.`);
+
+  } catch (error) {
+
+    console.error(
+      `❌ Erro ao criar "${match.strEvent}".`
+    );
+
+    throw error;
+
+  }
+
 }
 
 export async function updateMatchEvent(calendarId, eventId, match) {
-  const event = buildCalendarEvent(match);
 
-  await calendar.events.update({
-    calendarId,
-    eventId,
-    requestBody: event,
-  });
+  try {
 
-  console.log(`🔄 ${match.strEvent} atualizado.`);
+    await calendar.events.update({
+      calendarId,
+      eventId,
+      requestBody: buildCalendarEvent(match),
+    });
+
+    console.log(`🔄 ${match.strEvent} atualizado.`);
+
+  } catch (error) {
+
+    console.error(
+      `❌ Erro ao atualizar "${match.strEvent}".`
+    );
+
+    throw error;
+
+  }
+
+}
+
+export async function deleteCalendarEvent(calendarId, eventId) {
+
+  try {
+
+    await calendar.events.delete({
+      calendarId,
+      eventId,
+    });
+
+  } catch (error) {
+
+    console.error(
+      `❌ Erro ao remover evento duplicado (${eventId}).`
+    );
+
+    throw error;
+
+  }
+
 }
 
 export async function getCalendarEvents(calendarId) {
 
-  // Busca eventos dos últimos 120 dias
-  const timeMin = new Date();
-  timeMin.setDate(timeMin.getDate() - 120);
+  try {
 
-  // Busca eventos até 365 dias no futuro
-  const timeMax = new Date();
-  timeMax.setDate(timeMax.getDate() + 365);
+    const response = await calendar.events.list({
+      calendarId,
+      timeMin: new Date("2025-01-01").toISOString(),
+      singleEvents: true,
+      orderBy: "startTime",
+      maxResults: 250,
+    });
 
-  const response = await calendar.events.list({
-    calendarId,
-    timeMin: timeMin.toISOString(),
-    timeMax: timeMax.toISOString(),
-    singleEvents: true,
-    orderBy: "startTime",
-    maxResults: 500,
-  });
+    return response.data.items ?? [];
 
-  return response.data.items ?? [];
+  } catch (error) {
+
+    console.error(
+      "❌ Erro ao buscar eventos do Google Calendar."
+    );
+
+    throw error;
+
+  }
+
 }

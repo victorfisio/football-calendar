@@ -5,6 +5,7 @@ import {
 
 import { buildCalendarEvent } from "../utils/buildCalendarEvent.js";
 import { compareEvents } from "../utils/compareEvents.js";
+import { hasScheduleChanged } from "../utils/hasScheduleChanged.js";
 
 export async function syncMatch(
   calendarId,
@@ -14,6 +15,7 @@ export async function syncMatch(
 
   const existingEvent = eventMap.get(match.idEvent);
 
+  // Evento inexistente
   if (!existingEvent) {
 
     console.log(`➕ Criando: ${match.strEvent}`);
@@ -24,28 +26,62 @@ export async function syncMatch(
     );
 
     return;
+
   }
 
-  const desiredEvent = buildCalendarEvent(match);
+  // Detecta mudança de horário
+  if (hasScheduleChanged(existingEvent, match)) {
 
-  const equal = compareEvents(
-    existingEvent,
-    desiredEvent
-  );
+    const oldDate = new Date(existingEvent.start.dateTime);
 
-  if (!equal) {
+    const newDate = new Date(
+      `${match.dateEvent}T${match.strTime}`
+    );
 
-    console.log(`🔄 Atualizando: ${match.strEvent}`);
+    console.log("\n🕒 Horário alterado");
+    console.log(match.strEvent);
 
-    await updateMatchEvent(
-      calendarId,
-      existingEvent.id,
-      match
+    console.log(
+      oldDate.toLocaleString("pt-BR")
+    );
+
+    console.log("↓");
+
+    console.log(
+      newDate.toLocaleString("pt-BR")
+    );
+
+    console.log("");
+
+  }
+
+  const desiredEvent =
+    buildCalendarEvent(match);
+
+  const equal =
+    compareEvents(
+      existingEvent,
+      desiredEvent
+    );
+
+  if (equal) {
+
+    console.log(
+      `✔ Sem alterações: ${match.strEvent}`
     );
 
     return;
+
   }
 
-  console.log(`✔ Sem alterações: ${match.strEvent}`);
+  console.log(
+    `🔄 Atualizando: ${match.strEvent}`
+  );
+
+  await updateMatchEvent(
+    calendarId,
+    existingEvent.id,
+    match
+  );
 
 }
