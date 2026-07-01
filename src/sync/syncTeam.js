@@ -6,15 +6,20 @@ import { isLiveMatch } from "../utils/isLiveMatch.js";
 import { logger } from "../utils/logger.js";
 
 import { syncMatch } from "./syncMatch.js";
+
 import { removeDuplicates } from "../cleanup/removeDuplicates.js";
+import { removeMissingMatches } from "../cleanup/removeMissingMatches.js";
 
 export async function syncTeam(team) {
 
   logger.title(`Sincronizando ${team.name}`);
 
-  const matches = await getFixtures(team.id);
+  const matches =
+    await getFixtures(team.id);
 
-  logger.info(`Jogos encontrados: ${matches.length}`);
+  logger.info(
+    `Jogos encontrados: ${matches.length}`
+  );
 
   const liveMatches =
     matches.filter(isLiveMatch);
@@ -47,9 +52,11 @@ export async function syncTeam(team) {
 
   if (matches.length === 0) {
 
-    logger.warning("Nenhuma partida encontrada.");
+    logger.warning(
+      "Nenhuma partida encontrada."
+    );
 
-    return;
+    return liveMatches.length > 0;
 
   }
 
@@ -70,6 +77,19 @@ export async function syncTeam(team) {
 
   logger.info(
     `Eventos após limpeza: ${calendarEvents.length}`
+  );
+
+  await removeMissingMatches(
+    team.calendarId,
+    calendarEvents,
+    matches
+  );
+
+  calendarEvents =
+    await getCalendarEvents(team.calendarId);
+
+  logger.info(
+    `Eventos após remover partidas inexistentes: ${calendarEvents.length}`
   );
 
   const eventMap =
@@ -98,7 +118,7 @@ export async function syncTeam(team) {
   );
 
   console.log("");
-  
+
   return liveMatches.length > 0;
 
 }
