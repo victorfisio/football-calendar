@@ -9,17 +9,19 @@ export async function removeDuplicates(
 
   for (const event of calendarEvents) {
 
-    const sportsdbId =
-      event.extendedProperties?.private?.sportsdbId;
+    const fixtureId =
+      event.extendedProperties?.private?.fixtureId;
 
-    if (!sportsdbId)
+    if (!fixtureId)
       continue;
 
-    if (!groups.has(sportsdbId)) {
-      groups.set(sportsdbId, []);
+    if (!groups.has(fixtureId)) {
+
+      groups.set(fixtureId, []);
+
     }
 
-    groups.get(sportsdbId).push(event);
+    groups.get(fixtureId).push(event);
 
   }
 

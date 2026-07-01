@@ -1,45 +1,89 @@
 import {
+
   createMatchEvent,
+
   updateMatchEvent,
+
 } from "../services/googleCalendar.js";
 
 import { buildCalendarEvent } from "../utils/buildCalendarEvent.js";
+
 import { compareEvents } from "../utils/compareEvents.js";
+
 import { hasScheduleChanged } from "../utils/hasScheduleChanged.js";
 
 export async function syncMatch(
+
   calendarId,
+
   match,
-  eventMap
+
+  eventMap,
+
+  colorId
+
 ) {
 
-  const existingEvent = eventMap.get(match.idEvent);
+  const existingEvent =
+    eventMap.get(
+      String(match.fixture.id)
+    );
 
   // Evento inexistente
+
   if (!existingEvent) {
 
-    console.log(`➕ Criando: ${match.strEvent}`);
+    console.log(
+      `➕ Criando: ${match.teams.home.name} x ${match.teams.away.name}`
+    );
 
     await createMatchEvent(
+
       calendarId,
-      match
+
+      match,
+
+      colorId
+
     );
 
     return;
 
   }
 
-  // Detecta mudança de horário
-  if (hasScheduleChanged(existingEvent, match)) {
+  // Mudança de horário
 
-    const oldDate = new Date(existingEvent.start.dateTime);
+  if (
 
-    const newDate = new Date(
-      `${match.dateEvent}T${match.strTime}`
+    hasScheduleChanged(
+
+      existingEvent,
+
+      match
+
+    )
+
+  ) {
+
+    const oldDate =
+      new Date(
+        existingEvent.start.dateTime
+      );
+
+    const newDate =
+      new Date(
+        match.fixture.date
+      );
+
+    console.log("");
+
+    console.log("🕒 Horário alterado");
+
+    console.log(
+      `${match.teams.home.name} x ${match.teams.away.name}`
     );
 
-    console.log("\n🕒 Horário alterado");
-    console.log(match.strEvent);
+    console.log("");
 
     console.log(
       oldDate.toLocaleString("pt-BR")
@@ -56,18 +100,27 @@ export async function syncMatch(
   }
 
   const desiredEvent =
-    buildCalendarEvent(match);
+    buildCalendarEvent(
+
+      match,
+
+      colorId
+
+    );
 
   const equal =
     compareEvents(
+
       existingEvent,
+
       desiredEvent
+
     );
 
   if (equal) {
 
     console.log(
-      `✔ Sem alterações: ${match.strEvent}`
+      `✔ Sem alterações: ${match.teams.home.name} x ${match.teams.away.name}`
     );
 
     return;
@@ -75,13 +128,19 @@ export async function syncMatch(
   }
 
   console.log(
-    `🔄 Atualizando: ${match.strEvent}`
+    `🔄 Atualizando: ${match.teams.home.name} x ${match.teams.away.name}`
   );
 
   await updateMatchEvent(
+
     calendarId,
+
     existingEvent.id,
-    match
+
+    match,
+
+    colorId
+
   );
 
 }

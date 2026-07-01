@@ -4,13 +4,13 @@ dotenv.config();
 
 export const TEAMS = [
   {
-    id: 134465,
+    id: 121,
     name: "Palmeiras",
     calendarId: process.env.PALMEIRAS_CALENDAR_ID,
     color: "green",
   },
   {
-    id: 133604,
+    id: 42,
     name: "Arsenal",
     calendarId: process.env.ARSENAL_CALENDAR_ID,
     color: "red",

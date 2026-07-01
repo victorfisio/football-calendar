@@ -4,28 +4,30 @@ export function buildEventMap(events) {
 
   for (const event of events) {
 
-    let sportsdbId =
-      event.extendedProperties?.private?.sportsdbId;
+    let fixtureId =
+      event.extendedProperties?.private?.fixtureId;
 
     // Compatibilidade com eventos antigos
-    if (!sportsdbId && event.description) {
+    if (!fixtureId && event.description) {
 
       const legacyId =
         event.description.match(
-          /TheSportsDB\s+(\d+)/
+          /Fixture ID:\s*(\d+)/
         );
 
       if (legacyId) {
-        sportsdbId = legacyId[1];
+
+        fixtureId = legacyId[1];
+
       }
 
     }
 
-    if (!sportsdbId)
+    if (!fixtureId)
       continue;
 
     map.set(
-      sportsdbId,
+      String(fixtureId),
       event
     );
 

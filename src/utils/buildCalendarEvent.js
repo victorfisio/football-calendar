@@ -1,97 +1,95 @@
-import { COMPETITIONS } from "../config/competitions.js";
-import { SETTINGS } from "../config/settings.js";
+export function buildCalendarEvent(match, colorId) {
 
-import { buildSummary } from "./buildSummary.js";
-import { buildResultMessage } from "./buildResultMessage.js";
-import { buildMatchStatus } from "./buildMatchStatus.js";
+  const home = match.teams.home.name;
+  const away = match.teams.away.name;
 
-export function buildCalendarEvent(match) {
+  const start = new Date(match.fixture.date);
 
-  const competition =
-    COMPETITIONS[match.strLeague] ?? {
-      emoji: SETTINGS.DEFAULT_COMPETITION_EMOJI,
-      name: match.strLeague,
-    };
+  // duração padrão
+  const end = new Date(start);
+  end.setHours(end.getHours() + 2);
 
-  const start =
-    new Date(`${match.dateEvent}T${match.strTime}`);
+  const league = match.league.name;
+  const round = match.league.round ?? "";
 
-  const end =
-    new Date(
-      start.getTime() +
-      SETTINGS.MATCH_DURATION_MINUTES * 60 * 1000
-    );
+  const venue =
+    match.fixture.venue?.name
+      ? `${match.fixture.venue.name}${
+          match.fixture.venue.city
+            ? ` - ${match.fixture.venue.city}`
+            : ""
+        }`
+      : "";
 
-  const statusMessage =
-    buildMatchStatus(match);
+  const status = match.fixture.status.long;
 
-  const resultMessage =
-    buildResultMessage(match);
+  const goalsHome =
+    match.goals.home === null
+      ? "-"
+      : match.goals.home;
 
-  const sections = [
-
-    `🏆 Competição
-${competition.name}`,
-
-    `🏟 Estádio
-${match.strVenue ?? "A definir"}`,
-
-    `📅 Rodada
-${match.intRound ?? "-"}`
-
-  ];
-
-  if (statusMessage) {
-
-    sections.push(statusMessage);
-
-  }
-
-  if (resultMessage) {
-
-    sections.push(resultMessage);
-
-  }
-
-  sections.push("🤖 Football Calendar");
-
-  const description =
-    sections.join("\n\n━━━━━━━━━━━━━━━━━━\n\n");
+  const goalsAway =
+    match.goals.away === null
+      ? "-"
+      : match.goals.away;
 
   return {
 
-    summary: buildSummary(match),
+    summary: `${home} x ${away}`,
 
-    description,
+    description:
+`Competição: ${league}
+Rodada: ${round}
+
+Status: ${status}
+
+Placar:
+${home} ${goalsHome} x ${goalsAway} ${away}
+
+Fixture ID: ${match.fixture.id}`,
+
+    location: venue,
 
     start: {
       dateTime: start.toISOString(),
-      timeZone: SETTINGS.TIMEZONE,
+      timeZone: "America/Sao_Paulo",
     },
 
     end: {
       dateTime: end.toISOString(),
-      timeZone: SETTINGS.TIMEZONE,
+      timeZone: "America/Sao_Paulo",
     },
 
-    extendedProperties: {
-      private: {
-        sportsdbId: match.idEvent,
-      },
-    },
+    colorId,
 
     reminders: {
+
       useDefault: false,
+
       overrides: [
+
         {
           method: "popup",
           minutes: 60,
         },
+
         {
           method: "popup",
           minutes: 0,
         },
+
       ],
+
+    },
+
+    extendedProperties: {
+
+      private: {
+
+        fixtureId: String(match.fixture.id),
+
+      },
+
     },
 
   };

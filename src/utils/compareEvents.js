@@ -1,6 +1,10 @@
 export function compareEvents(currentEvent, desiredEvent) {
 
-  if (currentEvent.summary !== desiredEvent.summary) {
+  // Título
+  if (
+    (currentEvent.summary ?? "").trim() !==
+    (desiredEvent.summary ?? "").trim()
+  ) {
 
     console.log("Summary diferente");
     console.log("Google :", currentEvent.summary);
@@ -10,6 +14,7 @@ export function compareEvents(currentEvent, desiredEvent) {
 
   }
 
+  // Descrição
   if (
     (currentEvent.description ?? "").trim() !==
     (desiredEvent.description ?? "").trim()
@@ -21,6 +26,19 @@ export function compareEvents(currentEvent, desiredEvent) {
 
   }
 
+  // Local
+  if (
+    (currentEvent.location ?? "").trim() !==
+    (desiredEvent.location ?? "").trim()
+  ) {
+
+    console.log("Location diferente");
+
+    return false;
+
+  }
+
+  // Horário inicial
   const currentStart =
     new Date(currentEvent.start.dateTime).getTime();
 
@@ -30,19 +48,14 @@ export function compareEvents(currentEvent, desiredEvent) {
   if (currentStart !== desiredStart) {
 
     console.log("Start diferente");
-    console.log(
-      "Google :",
-      currentEvent.start.dateTime
-    );
-    console.log(
-      "Novo   :",
-      desiredEvent.start.dateTime
-    );
+    console.log("Google :", currentEvent.start.dateTime);
+    console.log("Novo   :", desiredEvent.start.dateTime);
 
     return false;
 
   }
 
+  // Horário final
   const currentEnd =
     new Date(currentEvent.end.dateTime).getTime();
 
@@ -57,6 +70,7 @@ export function compareEvents(currentEvent, desiredEvent) {
 
   }
 
+  // Lembretes
   const currentReminders =
     JSON.stringify(currentEvent.reminders ?? {});
 

@@ -10,7 +10,7 @@ export function hasScheduleChanged(
 
   const newTimestamp =
     new Date(
-      `${match.dateEvent}T${match.strTime}`
+      match.fixture.date
     ).getTime();
 
   return currentTimestamp !== newTimestamp;

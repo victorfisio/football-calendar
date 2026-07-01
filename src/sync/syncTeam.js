@@ -1,4 +1,4 @@
-import { getFixtures } from "../services/sportsdb.js";
+import { getFixtures } from "../services/apiFootball.js";
 import { getCalendarEvents } from "../services/googleCalendar.js";
 
 import { buildEventMap } from "../utils/eventMap.js";
@@ -27,14 +27,16 @@ export async function syncTeam(team) {
 
     for (const match of liveMatches) {
 
-      console.log(match.strEvent);
-
       console.log(
-        `Status: ${match.strStatus}`
+        `${match.teams.home.name} x ${match.teams.away.name}`
       );
 
       console.log(
-        `Placar: ${match.intHomeScore ?? 0}×${match.intAwayScore ?? 0}`
+        `Status: ${match.fixture.status.long}`
+      );
+
+      console.log(
+        `Placar: ${match.goals.home ?? 0} × ${match.goals.away ?? 0}`
       );
 
       console.log("");
@@ -96,5 +98,7 @@ export async function syncTeam(team) {
   );
 
   console.log("");
+  
+  return liveMatches.length > 0;
 
 }
